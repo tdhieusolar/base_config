@@ -8,7 +8,6 @@ if ! command -v git &> /dev/null; then
   echo "📦 Git chưa được cài. Đang cài..."
   sudo apt update
   sudo apt install -y git
-  echo "✅ Git: $(git --version)"
 else
   echo "✅ Git đã có: $(git --version)"
 fi
@@ -92,7 +91,36 @@ else
   echo "✅ TPM đã có"
 fi
 
-### 6. Cài LazyVim nếu chưa có
+### 6. Kiểm tra và cập nhật Neovim nếu cần
+echo "🔍 Đang kiểm tra phiên bản Neovim..."
+
+LATEST_NVIM=$(curl -s https://neovim.io | grep -oP 'Neovim \K[0-9]+\.[0-9]+' | head -n 1)
+INSTALLED_NVIM=$(nvim --version 2>/dev/null | head -n 1 | awk '{print $2}')
+
+if ! command -v nvim &> /dev/null; then
+  echo "📦 Neovim chưa có. Đang cài bản mới nhất..."
+  INSTALL_NVIM=true
+elif [ "$(printf '%s\n' "$LATEST_NVIM" "$INSTALLED_NVIM" | sort -V | head -n1)" != "$LATEST_NVIM" ]; then
+  echo "⚠️ Neovim hiện tại ($INSTALLED_NVIM) cũ hơn bản mới nhất ($LATEST_NVIM). Đang cập nhật..."
+  sudo apt remove -y neovim
+  INSTALL_NVIM=true
+else
+  echo "✅ Neovim đã có phiên bản mới: $INSTALLED_NVIM"
+  INSTALL_NVIM=false
+fi
+
+if [ "$INSTALL_NVIM" = true ]; then
+  sudo apt install -y ninja-build gettext cmake unzip curl build-essential
+  git clone https://github.com/neovim/neovim.git ~/neovim
+  cd ~/neovim
+  make CMAKE_BUILD_TYPE=Release
+  sudo make install
+  cd ~
+  rm -rf ~/neovim
+  echo "✅ Neovim đã được cài: $(nvim --version | head -n 1)"
+fi
+
+### 7. Cài LazyVim nếu chưa có
 NVIM_INIT="$HOME/.config/nvim/init.lua"
 if [ -f "$NVIM_INIT" ] && grep -q "LazyVim" "$NVIM_INIT"; then
   echo "✅ LazyVim đã có. Bỏ qua."
@@ -109,8 +137,4 @@ else
   echo "✅ LazyVim đã cài! Mở bằng: nvim"
 fi
 
-### 7. Cài thêm công cụ cho lập trình viên
-echo "📦 Đang cài thêm công cụ hỗ trợ lập trình..."
-sudo apt install -y ripgrep fd-find bat fzf htop neofetch gh lazygit zsh
-
-echo "🎉 Thiết lập hoàn tất! Sẵn sàng lập trình rồi đó Hieu!"
+echo "🎉 Thiết lập hoàn tất!"
