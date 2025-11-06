@@ -22,16 +22,19 @@ else
   echo "✅ TPM đã được cài"
 fi
 
-### 3. Tạo symbolic link cho cấu hình Neovim
-NVIM_SOURCE="$CONFIG/.config/nvim"
-NVIM_TARGET="$HOME/.config/nvim"
+### 3. Cài đặt LazyVim Starter cho Neovim
+echo "📦 Đang backup cấu hình Neovim hiện tại..."
 
-if [ -d "$NVIM_SOURCE" ]; then
-  mkdir -p "$HOME/.config"
-  ln -sfn "$NVIM_SOURCE" "$NVIM_TARGET"
-  echo "✅ Đã tạo symbolic link cho cấu hình Neovim"
-else
-  echo "⚠️ Không tìm thấy thư mục $NVIM_SOURCE"
-fi
+mv -v "$HOME/.config/nvim" "$HOME/.config/nvim.bak" 2>/dev/null
+mv -v "$HOME/.local/share/nvim" "$HOME/.local/share/nvim.bak" 2>/dev/null
+mv -v "$HOME/.local/state/nvim" "$HOME/.local/state/nvim.bak" 2>/dev/null
+mv -v "$HOME/.cache/nvim" "$HOME/.cache/nvim.bak" 2>/dev/null
 
+echo "🚀 Đang clone LazyVim Starter..."
+git clone https://github.com/LazyVim/starter "$HOME/.config/nvim"
+
+echo "🧹 Đang xoá thư mục .git để bạn có thể thêm vào repo của mình"
+rm -rf "$HOME/.config/nvim/.git"
+
+echo "✅ Đã cài đặt LazyVim! Bạn có thể mở Neovim bằng lệnh: nvim"
 echo "🎉 Thiết lập hoàn tất!"
