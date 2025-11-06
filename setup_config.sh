@@ -5,14 +5,18 @@ CONFIG="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo "🔧 Bắt đầu thiết lập cấu hình..."
 
-### 1. Tạo symbolic link cho .tmux.conf
-if [ -f "$CONFIG/.tmux.conf" ]; then
-  ln -sf "$CONFIG/.tmux.conf" "$HOME/.tmux.conf"
-  echo "✅ Đã tạo symbolic link cho .tmux.conf"
-else
-  echo "⚠️ Không tìm thấy $CONFIG/.tmux.conf"
+### 1. Backup và copy .tmux.conf
+if [ -f "$HOME/.tmux.conf" ]; then
+  cp -v "$HOME/.tmux.conf" "$HOME/.tmux.conf.bak"
+  echo "🗂️ Đã backup .tmux.conf thành .tmux.conf.bak"
 fi
 
+if [ -f "$CONFIG/.tmux.conf" ]; then
+  cp -v "$CONFIG/.tmux.conf" "$HOME/.tmux.conf"
+  echo "✅ Đã copy .tmux.conf mới vào ~/"
+else
+  echo "⚠️ Không tìm thấy .tmux.conf trong $CONFIG"
+fi
 ### 2. Cài đặt TPM nếu chưa có
 TPM_DIR="$HOME/.tmux/plugins/tpm"
 if [ ! -d "$TPM_DIR" ]; then
