@@ -94,7 +94,8 @@ fi
 ### 6. Kiểm tra và cập nhật Neovim nếu cần
 echo "🔍 Đang kiểm tra phiên bản Neovim..."
 
-LATEST_NVIM=$(curl -s https://neovim.io | grep -oP 'Neovim \K[0-9]+\.[0-9]+' | head -n 1)
+LATEST_NVIM=$(curl -s https://github.com/neovim/neovim/releases/latest | grep -oP 'tag/\Kv[0-9]+\.[0-9]+(\.[0-9]+)?')
+LATEST_NVIM=${LATEST_NVIM#v}
 INSTALLED_NVIM=$(nvim --version 2>/dev/null | head -n 1 | awk '{print $2}')
 
 if ! command -v nvim &> /dev/null; then
